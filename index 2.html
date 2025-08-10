@@ -1,0 +1,199 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Reckoning BO6 – Month Selection (Auto)</title>
+<style>
+  body{font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 24px; line-height: 1.4;}
+  h1{font-size: 1.4rem; margin: 0 0 8px}
+  .hint{background:#fff3cd; border:1px solid #ffe08a; padding:10px; margin:10px 0; font-size:0.95rem}
+  table{border-collapse: collapse; width: 100%; max-width: 920px;}
+  th, td{border: 1px solid #ddd; padding: 8px; text-align: left;}
+  th{background: #f4f4f4;}
+  select, input[type="text"]{width: 100%; box-sizing: border-box; padding: 6px}
+  .include{width: 80px; text-align:center}
+  .number{width: 120px}
+  .month{width: 140px}
+  .result{margin-top: 16px; padding: 12px; border: 1px dashed #bbb; max-width: 920px}
+  .small{font-size: 0.88rem; color:#555}
+</style>
+</head>
+<body>
+  <h1>Reckoning BO6 – Month Selection (Auto)</h1>
+  <div class="hint">Tip: Open this file in Safari/Chrome. The code updates automatically when you tick items or change months.</div>
+
+  <table id="sheet">
+    <thead>
+      <tr>
+        <th>Include</th>
+        <th>Item</th>
+        <th class="number">Number (from item)</th>
+        <th class="month">Month (MM)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="include"><input type="checkbox" class="inc" /></td>
+        <td>Katana</td>
+        <td><input type="text" value="2" /></td>
+        <td><select><option value="">—</option><option>1</option>
+<option>2</option>
+<option>3</option>
+<option>4</option>
+<option>5</option>
+<option>6</option>
+<option>7</option>
+<option>8</option>
+<option>9</option>
+<option>10</option>
+<option>11</option>
+<option>12</option></select></td>
+      </tr>
+      <tr>
+        <td class="include"><input type="checkbox" class="inc" /></td>
+        <td>Wristwatch</td>
+        <td><input type="text" value="5" /></td>
+        <td><select><option value="">—</option><option>1</option>
+<option>2</option>
+<option>3</option>
+<option>4</option>
+<option>5</option>
+<option>6</option>
+<option>7</option>
+<option>8</option>
+<option>9</option>
+<option>10</option>
+<option>11</option>
+<option>12</option></select></td>
+      </tr>
+      <tr>
+        <td class="include"><input type="checkbox" class="inc" /></td>
+        <td>Combat Goggles</td>
+        <td><input type="text" value="4" /></td>
+        <td><select><option value="">—</option><option>1</option>
+<option>2</option>
+<option>3</option>
+<option>4</option>
+<option>5</option>
+<option>6</option>
+<option>7</option>
+<option>8</option>
+<option>9</option>
+<option>10</option>
+<option>11</option>
+<option>12</option></select></td>
+      </tr>
+      <tr>
+        <td class="include"><input type="checkbox" class="inc" /></td>
+        <td>BND Badge</td>
+        <td><input type="text" value="6" /></td>
+        <td><select><option value="">—</option><option>1</option>
+<option>2</option>
+<option>3</option>
+<option>4</option>
+<option>5</option>
+<option>6</option>
+<option>7</option>
+<option>8</option>
+<option>9</option>
+<option>10</option>
+<option>11</option>
+<option>12</option></select></td>
+      </tr>
+      <tr>
+        <td class="include"><input type="checkbox" class="inc" /></td>
+        <td>Notso's Collar</td>
+        <td><input type="text" value="1" /></td>
+        <td><select><option value="">—</option><option>1</option>
+<option>2</option>
+<option>3</option>
+<option>4</option>
+<option>5</option>
+<option>6</option>
+<option>7</option>
+<option>8</option>
+<option>9</option>
+<option>10</option>
+<option>11</option>
+<option>12</option></select></td>
+      </tr>
+      <tr>
+        <td class="include"><input type="checkbox" class="inc" /></td>
+        <td>Scarf</td>
+        <td><input type="text" value="3" /></td>
+        <td><select><option value="">—</option><option>1</option>
+<option>2</option>
+<option>3</option>
+<option>4</option>
+<option>5</option>
+<option>6</option>
+<option>7</option>
+<option>8</option>
+<option>9</option>
+<option>10</option>
+<option>11</option>
+<option>12</option></select></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="result">
+    <div><b>Order (old → recent):</b> <span id="order">—</span></div>
+    <div style="margin-top:6px"><b>Final 4-digit code:</b> <span id="code">—</span></div>
+    <div class="small" style="margin-top:6px">Select 4 dossiers. Months are numbers (Jan=1 … Dec=12).</div>
+  </div>
+
+<script>
+(function(){
+  function getRows(){
+    return Array.from(document.querySelectorAll("#sheet tbody tr")).map(tr => {
+      const include = tr.querySelector('input.inc').checked;
+      const item = tr.children[1].textContent.trim();
+      const number = tr.children[2].querySelector('input').value.trim();
+      const monthStr = tr.children[3].querySelector('select').value.trim();
+      const month = parseInt(monthStr, 10);
+      const valid = Number.isInteger(month) && month >= 1 && month <= 12;
+      return {include, item, number, month, valid};
+    });
+  }
+
+  function monthName(m){
+    return ["January","February","March","April","May","June","July","August","September","October","November","December"][m-1];
+  }
+
+  function compute(){
+    const rows = getRows().filter(r => r.include);
+    if(rows.length === 0){
+      document.getElementById('order').textContent = "—";
+      document.getElementById('code').textContent = "—";
+      return;
+    }
+    const missing = rows.filter(r => !r.number || !r.valid);
+    if(missing.length){
+      document.getElementById('order').textContent = "Please select a month (1–12) for all included items.";
+      document.getElementById('code').textContent = "—";
+      return;
+    }
+    rows.sort((a,b)=> a.month - b.month || a.item.localeCompare(b.item));
+    const orderText = rows.map(r => `${r.item} (M${r.month} – ${monthName(r.month)})`).join(" → ");
+    const code = rows.map(r => r.number.replace(/\D/g,'')).filter(Boolean).join("");
+    document.getElementById('order').textContent = orderText || "—";
+    document.getElementById('code').textContent = code || "—";
+  }
+
+  function attach(){
+    document.querySelectorAll('input.inc').forEach(cb => cb.addEventListener('change', compute));
+    document.querySelectorAll('select').forEach(sel => sel.addEventListener('change', compute));
+    document.querySelectorAll('td:nth-child(3) input').forEach(inp => inp.addEventListener('input', compute));
+    compute(); // initial
+  }
+
+  if(document.readyState === "loading"){ document.addEventListener("DOMContentLoaded", attach); }
+  else { attach(); }
+})();
+</script>
+
+</body>
+</html>
