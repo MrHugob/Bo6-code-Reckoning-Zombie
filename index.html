@@ -193,41 +193,80 @@ Original Reckoning
   if(document.readyState === "loading"){ document.addEventListener("DOMContentLoaded", attach); }
   else { attach(); }
 })();
-</script>
-</script>
 
-<script>
+</script> <script>
 (function () {
   const table = document.querySelector('table');
-  const lignes = () => Array.from(table.querySelectorAll('tr')).slice(1);
+  if (!table) return;
 
-  function remplirAuto() {
-    let mois = 1; // commence en janvier
-    lignes().forEach(tr => {
+  const MONTH_BY_ITEM = {
+    'Katana': 12,
+    'Wristwatch': 9,
+    'Combat Goggles': 10,
+    'BND Badge': 6,
+    "Notso's Collar": 7,
+    'Scarf': 8
+  };
+
+  const rows = () => Array.from(table.querySelectorAll('tr')).slice(1);
+
+  function syncMonthsFromSelection() {
+    rows().forEach(tr => {
       const cb = tr.querySelector('input[type="checkbox"]');
-      const moisSelect = tr.querySelector('select');
-      if (!cb || !moisSelect) return;
+      const itemName = tr.querySelector('td:nth-child(2)')?.textContent.trim();
+      const monthField = tr.querySelector('select, input[type="number"]');
+      const mm = MONTH_BY_ITEM[itemName];
 
-      if (cb.checked) {
-        moisSelect.value = String(mois);
-        moisSelect.dispatchEvent(new Event('change', { bubbles: true }));
-        mois++;
-        if (mois > 12) mois = 1;
+      if (cb && cb.checked && monthField && mm) {
+        monthField.value = String(mm);
+        monthField.dispatchEvent(new Event('change', { bubbles: true }));
+        monthField.dispatchEvent(new Event('input', { bubbles: true }));
       }
     });
-
-    if (typeof window.updateOutput === 'function') window.updateOutput();
   }
 
-  table.addEventListener('change', e => {
-    if (e.target.type === 'checkbox') remplirAuto();
-  });
+  table.addEventListener('change', (e) => {
+    if (e.target.matches('input[type="checkbox"]')) syncMonthsFromSelection();
+  }, true);
 
-  remplirAuto();
+  syncMonthsFromSelection();
+})();(function () {
+    const table = document.querySelector('table');
+    if (!table) return;
+
+    const MONTH_BY_ITEM = {
+        'Katana': 12,
+        'Wristwatch': 9,
+        'Combat Goggles': 10,
+        'BND Badge': 6,
+        "Notso's Collar": 7,
+        'Scarf': 8
+    };
+
+    function syncMonthsFromSelection() {
+        const rows = Array.from(table.querySelectorAll('tr'));
+        rows.forEach(row => {
+            const itemCell = row.querySelector('td:first-child');
+            const monthField = row.querySelector('input[type="number"]');
+            if (itemCell && monthField) {
+                const itemName = itemCell.textContent.trim();
+                if (MONTH_BY_ITEM[itemName] !== undefined) {
+                    monthField.value = MONTH_BY_ITEM[itemName];
+                    monthField.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            }
+        });
+    }
+
+    table.addEventListener('change', e => {
+        if (e.target.matches('input[type="number"]')) {
+            syncMonthsFromSelection();
+        }
+    }, true);
+
+    syncMonthsFromSelection();
 })();
 </script>
+</body>
+</html>
 
-</body>
-</html>
-</body>
-</html>
