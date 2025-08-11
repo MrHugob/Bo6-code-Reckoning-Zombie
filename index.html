@@ -194,6 +194,40 @@ Original Reckoning
   else { attach(); }
 })();
 </script>
+</script>
 
+<script>
+(function () {
+  const table = document.querySelector('table');
+  const lignes = () => Array.from(table.querySelectorAll('tr')).slice(1);
+
+  function remplirAuto() {
+    let mois = 1; // commence en janvier
+    lignes().forEach(tr => {
+      const cb = tr.querySelector('input[type="checkbox"]');
+      const moisSelect = tr.querySelector('select');
+      if (!cb || !moisSelect) return;
+
+      if (cb.checked) {
+        moisSelect.value = String(mois);
+        moisSelect.dispatchEvent(new Event('change', { bubbles: true }));
+        mois++;
+        if (mois > 12) mois = 1;
+      }
+    });
+
+    if (typeof window.updateOutput === 'function') window.updateOutput();
+  }
+
+  table.addEventListener('change', e => {
+    if (e.target.type === 'checkbox') remplirAuto();
+  });
+
+  remplirAuto();
+})();
+</script>
+
+</body>
+</html>
 </body>
 </html>
